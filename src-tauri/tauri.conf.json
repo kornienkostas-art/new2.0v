@@ -13,7 +13,7 @@
       }
     ],
     "systemTray": {
-      "iconPath": "icons/icon.png",
+      "iconPath": "icons/icon.ico",
       "menuOnLeftClick": true
     },
     "allowlist": {
@@ -47,8 +47,7 @@
     "bundle": {
       "identifier": "rf.ussurochki.app",
       "icon": [
-        "icons/icon.ico",
-        "icons/icon.png"
+        "icons/icon.ico"
       ],
       "windows": {
         "webviewInstallMode": {
