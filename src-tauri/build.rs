@@ -1,6 +1,6 @@
 use std::fs::{self, File};
 use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 fn ensure_icon() {
   let manifest_dir = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| ".".into()));
@@ -23,7 +23,8 @@ fn ensure_icon() {
       px[3] = 255; // A
     }
 
-    let image = ico::IconImage::from_rgba(size, size, rgba);
+    // Используем корректный конструктор из ico crate
+    let image = ico::IconImage::from_rgba_data(size, size, rgba);
     let entry = ico::IconDirEntry::encode(&image).expect("encode icon");
     let mut dir = ico::IconDir::new(ico::ResourceType::Icon);
     dir.add_entry(entry);
@@ -35,8 +36,7 @@ fn ensure_icon() {
   // Также создадим простой PNG-плейсхолдер, если нужен (не обязателен для сборки).
   let png_path = icons_dir.join("icon.png");
   if !png_path.exists() {
-    // PNG заголовок + минимальные данные (неидеальный способ), проще записать заглушку текста.
-    // Чтобы не тащить зависимость image, создадим пустой файл с заметкой.
+    // Без зависимости image создадим текстовый плейсхолдер.
     let mut f = File::create(&png_path).expect("create icon.png");
     let _ = f.write_all(b"Placeholder icon.png (not a real PNG). Provide a proper icons/icon.png for production.");
   }
