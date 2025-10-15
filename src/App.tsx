@@ -168,13 +168,48 @@ function MklScreen({ onBack }: { onBack: () => void }) {
   const s = useStyles();
   const [rows, setRows] = useState<MklOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  useEffect(() => {
+  const load = () => {
+    setLoading(true);
     invoke<MklOrder[]>("mkl_orders")
       .then((data) => setRows(data))
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    load();
   }, []);
+
+  const changeStatus = async () => {
+    if (selectedId == null) return alert("Выберите строку (клик по строке).");
+    const val = prompt('Введите статус: "Не заказан", "Заказан", "Прозвонен", "Вручен"', "Заказан");
+    if (!val) return;
+    const ok = await invoke<boolean>("mkl_change_status", { id: selectedId, status: val });
+    if (!ok) {
+      alert("Ошибка смены статуса");
+    } else {
+      load();
+    }
+  };
+
+  const deleteRow = async () => {
+    if (selectedId == null) return alert("Выберите строку (клик по строке).");
+    if (!confirm("Удалить выбранную запись?")) return;
+    const ok = await invoke<boolean>("mkl_delete", { id: selectedId });
+    if (!ok) {
+      alert("Ошибка удаления");
+    } else {
+      setSelectedId(null);
+      load();
+    }
+  };
+
+  const exportTxt = async () => {
+    const ok = await invoke<boolean>("mkl_export_txt");
+    if (!ok) alert("Ошибка экспорта");
+  };
 
   return (
     <div className={s.root}>
@@ -183,13 +218,9 @@ function MklScreen({ onBack }: { onBack: () => void }) {
       </div>
       <div style={{ display: "flex", justifyContent: "flex-start", width: "900px", margin: "0 auto", marginTop: "18px", gap: 12 }}>
         <Button appearance="primary" size="large" onClick={onBack} style={{ fontWeight: 700 }}>← Главное меню</Button>
-        <Button appearance="primary">Новый заказ</Button>
-        <Button appearance="secondary">Редактировать</Button>
-        <Button appearance="secondary">Удалить</Button>
-        <Button appearance="secondary">Сменить статус</Button>
-        <Button appearance="secondary">Клиенты</Button>
-        <Button appearance="secondary">Товары</Button>
-        <Button appearance="secondary">Экспорт TXT</Button>
+        <Button appearance="secondary" onClick={changeStatus}>Сменить статус</Button>
+        <Button appearance="secondary" onClick={deleteRow}>Удалить</Button>
+        <Button appearance="secondary" onClick={exportTxt}>Экспорт TXT</Button>
       </div>
 
       <div className={s.card}>
@@ -217,7 +248,17 @@ function MklScreen({ onBack }: { onBack: () => void }) {
             </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.id} style={{ ...statusStyle(r.status) }}>
+                <tr
+                  key={r.id}
+                  style={{
+                    ...statusStyle(r.status),
+                    outline: selectedId === r.id ? "2px solid #2563eb" : "none",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => setSelectedId(r.id)}
+                  onDoubleClick={changeStatus}
+                  title="Щелкните для выбора; двойной щелчок — смена статуса"
+                >
                   <td style={{ padding: "8px 6px" }}>{r.fio}</td>
                   <td style={{ padding: "8px 6px" }}>{formatPhoneMask(r.phone)}</td>
                   <td style={{ padding: "8px 6px" }}>{r.product}</td>

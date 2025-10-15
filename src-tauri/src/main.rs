@@ -9,6 +9,7 @@ use log::{error, info};
 use env_logger;
 
 mod db;
+mod export;
 
 static APP_DIR: Lazy<PathBuf> = Lazy::new(|| {
     // Папка рядом с exe: текущая рабочая директория
@@ -165,6 +166,44 @@ fn mkl_orders() -> Vec<db::MklOrder> {
     db::list_mkl_orders(200).unwrap_or_default()
 }
 
+#[tauri::command]
+fn mkl_change_status(id: i64, status: String) -> bool {
+    match db::change_mkl_status(id, &status) {
+        Ok(_) => true,
+        Err(e) => {
+            error!("mkl_change_status error: {}", e);
+            false
+        }
+    }
+}
+
+#[tauri::command]
+fn mkl_delete(id: i64) -> bool {
+    match db::delete_mkl(id) {
+        Ok(_) => true,
+        Err(e) => {
+            error!("mkl_delete error: {}", e);
+            false
+        }
+    }
+}
+
+#[tauri::command]
+fn mkl_export_txt() -> bool {
+    let s = read_settings();
+    let export_dir = PathBuf::from(s.export_path);
+    match export::export_mkl_txt(export_dir.clone()) {
+        Ok(path) => {
+            let _ = export::open_file_crossplatform(&path);
+            true
+        }
+        Err(e) => {
+            error!("export mkl error: {}", e);
+            false
+        }
+    }
+}
+
 fn ensure_db_exists() {
     let db = db_path();
     if !db.exists() {
@@ -240,7 +279,14 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![maximize_on_start, get_settings, mkl_orders])
+        .invoke_handler(tauri::generate_handler![
+            maximize_on_start,
+            get_settings,
+            mkl_orders,
+            mkl_change_status,
+            mkl_delete,
+            mkl_export_txt
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

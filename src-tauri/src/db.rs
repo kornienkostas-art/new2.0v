@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::path::PathBuf;
 use rusqlite::{Connection, params};
 
@@ -121,4 +122,102 @@ pub fn list_mkl_orders(limit: i64) -> anyhow::Result<Vec<MklOrder>> {
         out.push(r?);
     }
     Ok(out)
+}
+
+pub fn change_mkl_status(id: i64, status: &str) -> anyhow::Result<()> {
+    let conn = Connection::open(db_file())?;
+    let now = chrono::Local::now().format("%Y-%m-%d %H:%M").to_string();
+    conn.execute(
+        "UPDATE mkl_orders SET status = ?1, date = ?2 WHERE id = ?3",
+        params![status, now, id],
+    )?;
+    Ok(())
+}
+
+pub fn delete_mkl(id: i64) -> anyhow::Result<()> {
+    let conn = Connection::open(db_file())?;
+    conn.execute("DELETE FROM mkl_orders WHERE id = ?1", params![id])?;
+    Ok(())
+}
+
+pub fn insert_mkl(order: &MklOrder) -> anyhow::Result<i64> {
+    let conn = Connection::open(db_file())?;
+    conn.execute(
+        "INSERT INTO mkl_orders (fio, phone, product, sph, cyl, ax, bc, qty, status, date, comment)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+        params![
+            order.fio,
+            order.phone,
+            order.product,
+            order.sph.as_ref().map(|s| s.as_str()),
+            order.cyl.as_ref().map(|s| s.as_str()),
+            order.ax,
+            order.bc,
+            order.qty,
+            order.status,
+            order.date,
+            order.comment
+        ],
+    )?;
+    Ok(conn.last_insert_rowid())
+}
+
+pub fn update_mkl(order: &MklOrder) -> anyhow::Result<()> {
+    let conn = Connection::open(db_file())?;
+    conn.execute(
+        "UPDATE mkl_orders
+         SET fio = ?1, phone = ?2, product = ?3, sph = ?4, cyl = ?5, ax = ?6, bc = ?7, qty = ?8, status = ?9, date = ?10, comment = ?11
+         WHERE id = ?12",
+        params![
+            order.fio,
+            order.phone,
+            order.product,
+            order.sph.as_ref().map(|s| s.as_str()),
+            order.cyl.as_ref().map(|s| s.as_str()),
+            order.ax,
+            order.bc,
+            order.qty,
+            order.status,
+            order.date,
+            order.comment,
+            order.id
+        ],
+    )?;
+    Ok(())
+}
+
+pub fn pending_grouped_by_product() -> anyhow::Result<HashMap<String, Vec<MklOrder>>> {
+    let conn = Connection::open(db_file())?;
+    let mut stmt = conn.prepare(
+        "SELECT id, fio, phone, product, sph, cyl, ax, bc, qty, status, date, comment
+         FROM mkl_orders
+         WHERE status = 'Не заказан'
+         ORDER BY product ASC, id ASC",
+    )?;
+    let mut groups: HashMap<String, Vec<MklOrder>> = HashMap::new();
+    let iter = stmt.query_map([], |row| {
+        Ok(MklOrder {
+            id: row.get(0)?,
+            fio: row.get(1)?,
+            phone: row.get(2)?,
+            product: row.get(3)?,
+            sph: row.get::<_, Option<String>>(4)?,
+            cyl: row.get::<_, Option<String>>(5)?,
+            ax: row.get::<_, Option<i64>>(6)?,
+            bc: row.get::<_, Option<f64>>(7)?,
+            qty: row.get(8)?,
+            status: row.get(9)?,
+            date: row.get(10)?,
+            comment: row.get(11)?,
+        })
+    })?;
+    for r in iter {
+        let order = r?;
+        let key = {
+            let p = order.product.trim();
+            if p.is_empty() { "(Без названия)".to_string() } else { p.to_string() }
+        };
+        groups.entry(key).or_default().push(order);
+    }
+    Ok(groups)
 }
