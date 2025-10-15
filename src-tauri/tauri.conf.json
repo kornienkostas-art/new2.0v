@@ -1,0 +1,67 @@
+{
+  "package": {
+    "productName": "УссурОчки.рф",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "windows": [
+      {
+        "title": "УссурОчки.рф — Заказ линз",
+        "fullscreen": false,
+        "resizable": true,
+        "decorations": true
+      }
+    ],
+    "systemTray": {
+      "iconPath": "icons/icon.png",
+      "menuOnLeftClick": true
+    },
+    "allowlist": {
+      "shell": {
+        "all": true
+      },
+      "dialog": {
+        "all": true
+      },
+      "fs": {
+        "readFile": true,
+        "writeFile": true,
+        "readDir": true,
+        "exists": true,
+        "createDir": true,
+        "removeFile": true
+      },
+      "path": {
+        "all": true
+      },
+      "window": {
+        "all": true
+      },
+      "notification": {
+        "all": true
+      }
+    },
+    "updater": {
+      "active": false
+    },
+    "bundle": {
+      "identifier": "rf.ussurochki.app",
+      "icon": [
+        "icons/icon.ico",
+        "icons/icon.png"
+      ],
+      "windows": {
+        "webviewInstallMode": {
+          "type": "downloadBootstrapper",
+          "silent": true
+        }
+      }
+    }
+  },
+  "build": {
+    "beforeDevCommand": "vite",
+    "beforeBuildCommand": "vite build",
+    "devPath": "http://localhost:5173",
+    "distDir": "../dist"
+  }
+}
