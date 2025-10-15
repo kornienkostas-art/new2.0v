@@ -224,14 +224,8 @@ fn main() {
                 if let Some(window) = app.get_window("main") {
                     let _ = window.show();
                     let _ = window.set_focus();
-                } else {
-                    // Если окна нет — просто покажем сообщение без привязки к окну.
-                    tauri::api::dialog::message::<tauri::Wry>(
-                        None,
-                        "Открыть",
-                        "Главное окно недоступно.",
-                    );
                 }
+                // Если окно недоступно — просто пропустим действие без диалога.
             }
             _ => {}
         })
