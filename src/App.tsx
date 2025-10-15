@@ -182,7 +182,8 @@ function MklScreen({ onBack }: { onBack: () => void }) {
   const [rows, setRows] = useState<MklOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [statusOpen, setStatus
+  const [statusOpen, setStatusOpen] = useState(false);
+ 
   const load = () => {
     setLoading(true);
     invoke<MklOrder[]>("mkl_orders")
