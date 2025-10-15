@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "tauri": "npx tauri",
-    "tauri:dev": "npx tauri dev",
-    "tauri:build": "npx tauri build"
+    "tauri": "node ./node_modules/@tauri-apps/cli/bin/tauri.js",
+    "tauri:dev": "node ./node_modules/@tauri-apps/cli/bin/tauri.js dev",
+    "tauri:build": "node ./node_modules/@tauri-apps/cli/bin/tauri.js build"
   },
   "dependencies": {
     "@fluentui/react-components": "^9.43.0",
