@@ -302,57 +302,7 @@ function MklScreen({ onBack }: { onBack: () => void }) {
                   <td style={{ padding: "8px 6px" }}>{r.date}</td>
                   <td style={{ padding: "8px 6px" }}>{r.comment && r.comment.trim() !== "" ? "ЕСТЬ" : "НЕТ"}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Диалог смены статуса */}
-      <Dialog open={statusOpen} onOpenChange={(_, data) => setStatusOpen(data.open)}>
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>Сменить статус</DialogTitle>
-            <DialogContent>
-              <Dropdown
-                selectedOptions={[selectedStatus]}
-                onOptionSelect={(_, data) => setSelectedStatus(data.optionValue as string)}
-              >
-                <Option value="Не заказан">Не заказан</Option>
-                <Option value="Заказан">Заказан</Option>
-                <Option value="Прозвонен">Прозвонен</Option>
-                <Option value="Вручен">Вручен</Option>
-              </Dropdown>
-            </DialogContent>
-            <DialogActions>
-              <Button appearance="secondary" onClick={() => setStatusOpen(false)}>Отмена</Button>
-              <Button appearance="primary" onClick={confirmChangeStatus}>Применить</Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
-
-      {/* Диалог удаления */}
-      <Dialog open={deleteOpen} onOpenChange={(_, data) => setDeleteOpen(data.open)}>
-        <DialogSurface>
-          <DialogBody>
-            <DialogTitle>Удалить запись</DialogTitle>
-            <DialogContent>Вы уверены, что хотите удалить выбранную запись?</DialogContent>
-            <DialogActions>
-              <Button appearance="secondary" onClick={() => setDeleteOpen(false)}>Отмена</Button>
-              <Button appearance="primary" onClick={confirmDelete}>Удалить</Button>
-            </DialogActions>
-          </DialogBody>
-        </DialogSurface>
-      </Dialog>
-
-      <div className={s.footer}>
-        <SystemRegular />
-        <span style={{ marginLeft: 8 }}>Tauri (Rust) + React + Fluent UI</span>
-      </div>
-    </div>
-  );
-}
+              ))
             </tbody>
           </table>
         )}
