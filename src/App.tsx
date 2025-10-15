@@ -1,5 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Button, makeStyles, shorthands, Text } from "@fluentui/react-components";
+import {
+  Button,
+  makeStyles,
+  shorthands,
+  Text,
+  Dialog,
+  DialogSurface,
+  DialogBody,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Dropdown,
+  Option
+} from "@fluentui/react-components";
 import { invoke } from "@tauri-apps/api";
 import { SystemRegular } from "@fluentui/react-icons";
 
@@ -169,7 +182,7 @@ function MklScreen({ onBack }: { onBack: () => void }) {
   const [rows, setRows] = useState<MklOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<number | null>(null);
-
+  const [statusOpen, setStatus
   const load = () => {
     setLoading(true);
     invoke<MklOrder[]>("mkl_orders")
@@ -183,10 +196,17 @@ function MklScreen({ onBack }: { onBack: () => void }) {
   }, []);
 
   const changeStatus = async () => {
-    if (selectedId == null) return alert("Выберите строку (клик по строке).");
-    const val = prompt('Введите статус: "Не заказан", "Заказан", "Прозвонен", "Вручен"', "Заказан");
-    if (!val) return;
-    const ok = await invoke<boolean>("mkl_change_status", { id: selectedId, status: val });
+    if (selectedId == null) {
+      alert("Выберите строку (клик по строке).");
+      return;
+    }
+    setStatusOpen(true);
+  };
+
+  const confirmChangeStatus = async () => {
+    if (selectedId == null) return;
+    const ok = await invoke<boolean>("mkl_change_status", { id: selectedId, status: selectedStatus });
+    setStatusOpen(false);
     if (!ok) {
       alert("Ошибка смены статуса");
     } else {
@@ -195,9 +215,17 @@ function MklScreen({ onBack }: { onBack: () => void }) {
   };
 
   const deleteRow = async () => {
-    if (selectedId == null) return alert("Выберите строку (клик по строке).");
-    if (!confirm("Удалить выбранную запись?")) return;
+    if (selectedId == null) {
+      alert("Выберите строку (клик по строке).");
+      return;
+    }
+    setDeleteOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedId == null) return;
     const ok = await invoke<boolean>("mkl_delete", { id: selectedId });
+    setDeleteOpen(false);
     if (!ok) {
       alert("Ошибка удаления");
     } else {
@@ -256,7 +284,7 @@ function MklScreen({ onBack }: { onBack: () => void }) {
                     cursor: "pointer"
                   }}
                   onClick={() => setSelectedId(r.id)}
-                  onDoubleClick={changeStatus}
+                  onDoubleClick={() => setStatusOpen(true)}
                   title="Щелкните для выбора; двойной щелчок — смена статуса"
                 >
                   <td style={{ padding: "8px 6px" }}>{r.fio}</td>
@@ -276,6 +304,45 @@ function MklScreen({ onBack }: { onBack: () => void }) {
           </table>
         )}
       </div>
+
+      {/* Диалог смены статуса */}
+      <Dialog open={statusOpen} onOpenChange={(_, data) => setStatusOpen(data.open)}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>Сменить статус</DialogTitle>
+            <DialogContent>
+              <Dropdown
+                selectedOptions={[selectedStatus]}
+                onOptionSelect={(_, data) => setSelectedStatus(data.optionValue as string)}
+              >
+                <Option value="Не заказан">Не заказан</Option>
+                <Option value="Заказан">Заказан</Option>
+                <Option value="Прозвонен">Прозвонен</Option>
+                <Option value="Вручен">Вручен</Option>
+              </Dropdown>
+            </DialogContent>
+            <DialogActions>
+              <Button appearance="secondary" onClick={() => setStatusOpen(false)}>Отмена</Button>
+              <Button appearance="primary" onClick={confirmChangeStatus}>Применить</Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
+
+      {/* Диалог удаления */}
+      <Dialog open={deleteOpen} onOpenChange={(_, data) => setDeleteOpen(data.open)}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>Удалить запись</DialogTitle>
+            <DialogContent>Вы уверены, что хотите удалить выбранную запись?</DialogContent>
+            <DialogActions>
+              <Button appearance="secondary" onClick={() => setDeleteOpen(false)}>Отмена</Button>
+              <Button appearance="primary" onClick={confirmDelete}>Удалить</Button>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
+
       <div className={s.footer}>
         <SystemRegular />
         <span style={{ marginLeft: 8 }}>Tauri (Rust) + React + Fluent UI</span>

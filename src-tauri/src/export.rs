@@ -1,9 +1,9 @@
 use std::fs;
 use std::io::Write;
-use std::path::{PathBuf};
+use std::path::PathBuf;
 use anyhow::Result;
 
-use crate::db::{pending_grouped_by_product};
+use crate::db::pending_grouped_by_product;
 
 fn ensure_dir(path: &PathBuf) -> PathBuf {
     if !path.exists() {
@@ -25,6 +25,11 @@ pub fn export_mkl_txt(export_dir: PathBuf) -> Result<PathBuf> {
 
     let mut file = fs::File::create(&filepath)?;
     let groups = pending_grouped_by_product()?;
+
+    if groups.is_empty() {
+        writeln!(file, "Нет незакозанных позиций для экспорта.")?;
+        return Ok(filepath);
+    }
 
     for (product, items) in groups {
         // Заголовок — название товара
