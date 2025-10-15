@@ -1,10 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{
-    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, Wry,
-};
+use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
 use once_cell::sync::Lazy;
 use log::{error, info};
@@ -95,15 +93,33 @@ fn read_settings() -> Settings {
                 let mut s: Settings = serde_json::from_str(&content).unwrap_or_default();
                 // Дополнение недостающих полей дефолтами:
                 let defaults = Settings::default();
-                if s.version == 0 { s.version = defaults.version; }
-                if s.ui_scale == 0.0 { s.ui_scale = defaults.ui_scale; }
-                if s.ui_font_size == 0 { s.ui_font_size = defaults.ui_font_size; }
-                if s.export_path.trim().is_empty() { s.export_path = defaults.export_path; }
-                if s.tray_logo_path.trim().is_empty() { s.tray_logo_path = defaults.tray_logo_path; }
-                if s.notify_time.trim().is_empty() { s.notify_time = defaults.notify_time; }
-                if s.mkl_notify_time.trim().is_empty() { s.mkl_notify_time = defaults.mkl_notify_time; }
-                if s.notify_sound_alias.trim().is_empty() { s.notify_sound_alias = defaults.notify_sound_alias; }
-                if s.notify_sound_mode.trim().is_empty() { s.notify_sound_mode = defaults.notify_sound_mode; }
+                if s.version == 0 {
+                    s.version = defaults.version;
+                }
+                if s.ui_scale == 0.0 {
+                    s.ui_scale = defaults.ui_scale;
+                }
+                if s.ui_font_size == 0 {
+                    s.ui_font_size = defaults.ui_font_size;
+                }
+                if s.export_path.trim().is_empty() {
+                    s.export_path = defaults.export_path;
+                }
+                if s.tray_logo_path.trim().is_empty() {
+                    s.tray_logo_path = defaults.tray_logo_path;
+                }
+                if s.notify_time.trim().is_empty() {
+                    s.notify_time = defaults.notify_time;
+                }
+                if s.mkl_notify_time.trim().is_empty() {
+                    s.mkl_notify_time = defaults.mkl_notify_time;
+                }
+                if s.notify_sound_alias.trim().is_empty() {
+                    s.notify_sound_alias = defaults.notify_sound_alias;
+                }
+                if s.notify_sound_mode.trim().is_empty() {
+                    s.notify_sound_mode = defaults.notify_sound_mode;
+                }
                 s
             }
             Err(e) => {
@@ -176,29 +192,34 @@ fn main() {
     tauri::Builder::default()
         .system_tray(build_tray())
         .on_system_tray_event(|app, event| match event {
-            SystemTrayEvent::MenuItemClick { id, .. } => {
-                match id.as_str() {
-                    "open" => {
-                        if let Some(window) = app.get_window("main") {
-                            let _ = window.show();
-                            let _ = window.set_focus();
-                        }
+            SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+                "open" => {
+                    if let Some(window) = app.get_window("main") {
+                        let _ = window.show();
+                        let _ = window.set_focus();
                     }
-                    "autostart_toggle" => {
-                        // TODO: переключение автозапуска (реестр) — реализуем далее
+                }
+                "autostart_toggle" => {
+                    if let Some(window) = app.get_window("main") {
                         tauri::api::dialog::message(
-                            Some(app.get_window("main").unwrap()),
+                            Some(&window),
                             "Автозапуск",
-                            "Переключение автозапуска будет реализовано на следующем шаге."
+                            "Переключение автозапуска будет реализовано на следующем шаге.",
+                        );
+                    } else {
+                        tauri::api::dialog::message(
+                            None,
+                            "Автозапуск",
+                            "Переключение автозапуска будет реализовано на следующем шаге.",
                         );
                     }
-                    "quit" => {
-                        // Сохранить геометрию окна при выходе — реализуем позже
-                        std::process::exit(0);
-                    }
-                    _ => {}
                 }
-            }
+                "quit" => {
+                    // Сохранить геометрию окна при выходе — реализуем позже
+                    std::process::exit(0);
+                }
+                _ => {}
+            },
             SystemTrayEvent::LeftClick { .. } => {
                 if let Some(window) = app.get_window("main") {
                     let _ = window.show();
@@ -207,10 +228,7 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![
-            maximize_on_start,
-            get_settings
-        ])
+        .invoke_handler(tauri::generate_handler![maximize_on_start, get_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

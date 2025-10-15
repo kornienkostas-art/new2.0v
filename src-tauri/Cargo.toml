@@ -25,6 +25,8 @@ rusqlite = { version = "0.31", features = ["bundled"] }
 # Windows-specific sound/autostart (позже добавим winapi usage)
 # winreg можно использовать для автозапуска
 winreg = "0.52"
+# Домашняя директория для Desktop по умолчанию
+home = "0.5"
 
 [features]
 # Пробросим фичу custom-protocol в tauri, чтобы tauri CLI не ругался
