@@ -10,6 +10,7 @@ rust-version = "1.70"
 
 [build-dependencies]
 tauri-build = { version = "1", features = [] }
+ico = "0.4"
 
 [dependencies]
 tauri = { version = "1", features = ["system-tray", "shell-open", "dialog"] }
