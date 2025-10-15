@@ -27,7 +27,9 @@ rusqlite = { version = "0.31", features = ["bundled"] }
 winreg = "0.52"
 
 [features]
+# Пробросим фичу custom-protocol в tauri, чтобы tauri CLI не ругался
 default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
 
 [profile.release]
 panic = "abort"
