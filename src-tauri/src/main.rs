@@ -8,6 +8,8 @@ use once_cell::sync::Lazy;
 use log::{error, info};
 use env_logger;
 
+mod db;
+
 static APP_DIR: Lazy<PathBuf> = Lazy::new(|| {
     // Папка рядом с exe: текущая рабочая директория
     std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
@@ -158,6 +160,11 @@ fn get_settings() -> Settings {
     read_settings()
 }
 
+#[tauri::command]
+fn mkl_orders() -> Vec<db::MklOrder> {
+    db::list_mkl_orders(200).unwrap_or_default()
+}
+
 fn ensure_db_exists() {
     let db = db_path();
     if !db.exists() {
@@ -188,6 +195,10 @@ fn main() {
     let settings = read_settings();
     info!("Настройки загружены: {:?}", settings);
     ensure_db_exists();
+    // Инициализация БД (создание таблиц и демо-данных)
+    if let Err(e) = db::init_db() {
+        error!("Ошибка инициализации БД: {}", e);
+    }
 
     tauri::Builder::default()
         .system_tray(build_tray())
@@ -229,7 +240,7 @@ fn main() {
             }
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![maximize_on_start, get_settings])
+        .invoke_handler(tauri::generate_handler![maximize_on_start, get_settings, mkl_orders])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

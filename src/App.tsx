@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Button, makeStyles, shorthands, Text } from "@fluentui/react-components";
-import { appWindow } from "@tauri-apps/api/window";
 import { invoke } from "@tauri-apps/api";
 import { SystemRegular } from "@fluentui/react-icons";
 
@@ -46,7 +45,7 @@ const useStyles = makeStyles({
     ...shorthands.borderRadius("10px"),
     ...shorthands.padding("24px"),
     boxShadow: "0 6px 20px rgba(0,0,0,0.08)",
-    width: "620px",
+    width: "900px",
     margin: "0 auto",
     marginTop: "24px"
   },
@@ -59,17 +58,8 @@ export default function App() {
   const [screen, setScreen] = useState<Screen>("menu");
 
   useEffect(() => {
-    // При первом запуске — максимизация окна (Windows)
     invoke("maximize_on_start").catch(() => {});
   }, []);
-
-  const BackButton = () => (
-    <div style={{ display: "flex", justifyContent: "flex-start", width: "620px", margin: "0 auto", marginTop: "18px" }}>
-      <Button appearance="primary" size="large" className={s.bigButton} onClick={() => setScreen("menu")}>
-        ← Назад
-      </Button>
-    </div>
-  );
 
   const Menu = () => (
     <div className={s.root}>
@@ -100,28 +90,155 @@ export default function App() {
     </div>
   );
 
-  const Placeholder = (title: string, subtitle: string) => (
+  if (screen === "menu") return <Menu />;
+
+  if (screen === "mkl") {
+    return <MklScreen onBack={() => setScreen("menu")} />;
+  }
+
+  if (screen === "meridian") return <Placeholder title="Заказ Меридиан • Список заказов" subtitle="Каждый заказ может содержать несколько позиций товара" />;
+  if (screen === "clients") return <Placeholder title="Клиенты" subtitle="Поиск, добавление, редактирование, удаление" />;
+  if (screen === "products_mkl") return <Placeholder title="Товары (МКЛ)" subtitle="Добавить/редактировать/удалить" />;
+  if (screen === "products_meridian") return <Placeholder title="Товары (Меридиан)" subtitle="Добавить/редактировать/удалить" />;
+  if (screen === "settings") return <Placeholder title="Настройки" subtitle="Масштаб, шрифт, трей, автозапуск, уведомления и звук" />;
+
+  return null;
+}
+
+function Placeholder({ title, subtitle }: { title: string; subtitle: string }) {
+  const s = useStyles();
+  return (
     <div className={s.root}>
       <div className={s.header}>
         <Text className={s.title}>{title}</Text>
       </div>
-      <BackButton />
       <div className={s.card}>
         <Text>{subtitle}</Text>
-        <div style={{ marginTop: 12, color: "#374151" }}>
-          Экран будет содержать таблицу, контекстное меню, формы и цветовые метки статусов — согласно ТЗ.
-        </div>
       </div>
     </div>
   );
+}
 
-  if (screen === "menu") return <Menu />;
-  if (screen === "mkl") return Placeholder("Заказ МКЛ • Таблица данных", "Поля: ФИО, Телефон, Товар, Sph, Cyl, Ax, BC, Количество, Статус, Дата, Комментарий");
-  if (screen === "meridian") return Placeholder("Заказ Меридиан • Список заказов", "Каждый заказ может содержать несколько позиций товара");
-  if (screen === "clients") return Placeholder("Клиенты", "Поиск, добавление, редактирование, удаление");
-  if (screen === "products_mkl") return Placeholder("Товары (МКЛ)", "Добавить/редактировать/удалить");
-  if (screen === "products_meridian") return Placeholder("Товары (Меридиан)", "Добавить/редактировать/удалить");
-  if (screen === "settings") return Placeholder("Настройки", "Масштаб, шрифт, трей, автозапуск, уведомления и звук");
+type MklOrder = {
+  id: number;
+  fio: string;
+  phone: string;
+  product: string;
+  sph?: string | null;
+  cyl?: string | null;
+  ax?: number | null;
+  bc?: number | null;
+  qty: number;
+  status: "Не заказан" | "Заказан" | "Прозвонен" | "Вручен" | string;
+  date: string;
+  comment: string;
+};
 
-  return null;
+function formatPhoneMask(raw: string): string {
+  const digits = raw.replace(/\D/g, "");
+  if (digits.length >= 11) {
+    const first = digits[0];
+    const ten = digits.slice(-10);
+    const format8 = (n: string) => `8-${n.slice(0,3)}-${n.slice(3,6)}-${n.slice(6,8)}-${n.slice(8,10)}`;
+    if (first === "7") return `+7-${digits.slice(1,4)}-${digits.slice(4,7)}-${digits.slice(7,9)}-${digits.slice(9,11)}`;
+    if (first === "8") return format8(digits.slice(1,11));
+    return format8(ten);
+  } else if (digits.length === 10) {
+    return `8-${digits.slice(0,3)}-${digits.slice(3,6)}-${digits.slice(6,8)}-${digits.slice(8,10)}`;
+  }
+  return raw.trim();
+}
+
+function statusStyle(status: string): React.CSSProperties {
+  switch (status) {
+    case "Не заказан":
+      return { backgroundColor: "#fee2e2", color: "#7f1d1d" };
+    case "Заказан":
+      return { backgroundColor: "#fef3c7", color: "#7c2d12" };
+    case "Прозвонен":
+      return { backgroundColor: "#dbeafe", color: "#1e3a8a" };
+    case "Вручен":
+      return { backgroundColor: "#dcfce7", color: "#065f46" };
+    default:
+      return {};
+  }
+}
+
+function MklScreen({ onBack }: { onBack: () => void }) {
+  const s = useStyles();
+  const [rows, setRows] = useState<MklOrder[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    invoke<MklOrder[]>("mkl_orders")
+      .then((data) => setRows(data))
+      .catch(() => setRows([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className={s.root}>
+      <div className={s.header}>
+        <Text className={s.title}>Заказ МКЛ • Таблица данных</Text>
+      </div>
+      <div style={{ display: "flex", justifyContent: "flex-start", width: "900px", margin: "0 auto", marginTop: "18px", gap: 12 }}>
+        <Button appearance="primary" size="large" onClick={onBack} style={{ fontWeight: 700 }}>← Главное меню</Button>
+        <Button appearance="primary">Новый заказ</Button>
+        <Button appearance="secondary">Редактировать</Button>
+        <Button appearance="secondary">Удалить</Button>
+        <Button appearance="secondary">Сменить статус</Button>
+        <Button appearance="secondary">Клиенты</Button>
+        <Button appearance="secondary">Товары</Button>
+        <Button appearance="secondary">Экспорт TXT</Button>
+      </div>
+
+      <div className={s.card}>
+        <div style={{ fontWeight: 600, marginBottom: 12 }}>Поля: ФИО, Телефон, Товар, Sph, Cyl, Ax, BC, Количество, Статус, Дата, Комментарий</div>
+        {loading ? (
+          <div>Загрузка…</div>
+        ) : rows.length === 0 ? (
+          <div>Нет записей</div>
+        ) : (
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ textAlign: "left", borderBottom: "1px solid #e5e7eb" }}>
+                <th>ФИО</th>
+                <th>Телефон</th>
+                <th>Товар</th>
+                <th>Sph</th>
+                <th>Cyl</th>
+                <th>Ax</th>
+                <th>BC</th>
+                <th>Количество</th>
+                <th>Статус</th>
+                <th>Дата</th>
+                <th>Комментарий</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id} style={{ ...statusStyle(r.status) }}>
+                  <td style={{ padding: "8px 6px" }}>{r.fio}</td>
+                  <td style={{ padding: "8px 6px" }}>{formatPhoneMask(r.phone)}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.product}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.sph ?? ""}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.cyl ?? ""}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.ax ?? ""}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.bc ?? ""}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.qty}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.status}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.date}</td>
+                  <td style={{ padding: "8px 6px" }}>{r.comment && r.comment.trim() !== "" ? "ЕСТЬ" : "НЕТ"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+      <div className={s.footer}>
+        <SystemRegular />
+        <span style={{ marginLeft: 8 }}>Tauri (Rust) + React + Fluent UI</span>
+      </div>
+    </div>
+  );
 }
