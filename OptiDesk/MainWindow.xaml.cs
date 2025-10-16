@@ -1,170 +1,41 @@
-using OptiDesk.Data;
-using OptiDesk.Models;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
+using OptiDesk.Views.Legacy;
+using OptiDesk.Views.Pages;
 
 namespace OptiDesk
 {
     public partial class MainWindow : Window
     {
-        private readonly OptiDeskDbContext _db = new OptiDeskDbContext();
-
-        public ObservableCollection<OrderMKL> OrdersMkl { get; set; } = new();
-        public ObservableCollection<OrderMeridian> OrdersMeridian { get; set; } = new();
-        public ObservableCollection<PriceItem> Prices { get; set; } = new();
-
         public MainWindow()
         {
             InitializeComponent();
-
-            // Ensure database exists
-            _db.Database.EnsureCreated();
-
-            LoadData();
+            // Default content: legacy tabs to preserve current functionality
+            MainFrame.Content = new LegacyTabsView();
         }
 
-        private void LoadData()
+        private void OpenLegacy_Click(object sender, RoutedEventArgs e)
         {
-            OrdersMkl = new ObservableCollection<OrderMKL>(_db.OrdersMKL.OrderByDescending(o => o.Id).ToList());
-            OrdersMeridian = new ObservableCollection<OrderMeridian>(_db.OrdersMeridian.OrderByDescending(o => o.Id).ToList());
-            Prices = new ObservableCollection<PriceItem>(_db.PriceItems.OrderByDescending(p => p.Id).ToList());
-
-            OrderMklGrid.ItemsSource = OrdersMkl;
-            OrderMeridianGrid.ItemsSource = OrdersMeridian;
-            PriceGrid.ItemsSource = Prices;
+            MainFrame.Content = new LegacyTabsView();
         }
 
-        // MKL
-        private void AddOrderMkl_Click(object sender, RoutedEventArgs e)
+        private void OpenOrdersMkl_Click(object sender, RoutedEventArgs e)
         {
-            var item = new OrderMKL { Status = "Новый" };
-            OrdersMkl.Insert(0, item);
-            OrderMklGrid.SelectedItem = item;
-            OrderMklGrid.ScrollIntoView(item);
+            MainFrame.Content = new OrdersMklPage();
         }
 
-        private void DeleteOrderMkl_Click(object sender, RoutedEventArgs e)
+        private void OpenOrdersMeridian_Click(object sender, RoutedEventArgs e)
         {
-            var selected = OrderMklGrid.SelectedItems.Cast<OrderMKL>().ToList();
-            if (selected.Count == 0) return;
-
-            foreach (var s in selected)
-            {
-                OrdersMkl.Remove(s);
-                if (s.Id != 0)
-                {
-                    _db.OrdersMKL.Remove(s);
-                }
-            }
-            _db.SaveChanges();
+            MainFrame.Content = new OrdersMeridianPage();
         }
 
-        private void SaveOrderMkl_Click(object sender, RoutedEventArgs e)
+        private void OpenPrices_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var item in OrdersMkl)
-            {
-                if (item.Id == 0)
-                {
-                    _db.OrdersMKL.Add(item);
-                }
-                else
-                {
-                    _db.OrdersMKL.Update(item);
-                }
-            }
-            _db.SaveChanges();
-            LoadData();
+            MainFrame.Content = new PricesPage();
         }
 
-        // Meridian
-        private void AddOrderMeridian_Click(object sender, RoutedEventArgs e)
+        private void OpenSettings_Click(object sender, RoutedEventArgs e)
         {
-            var item = new OrderMeridian { Status = "Новый", Supplier = "Меридиан" };
-            OrdersMeridian.Insert(0, item);
-            OrderMeridianGrid.SelectedItem = item;
-            OrderMeridianGrid.ScrollIntoView(item);
-        }
-
-        private void DeleteOrderMeridian_Click(object sender, RoutedEventArgs e)
-        {
-            var selected = OrderMeridianGrid.SelectedItems.Cast<OrderMeridian>().ToList();
-            if (selected.Count == 0) return;
-
-            foreach (var s in selected)
-            {
-                OrdersMeridian.Remove(s);
-                if (s.Id != 0)
-                {
-                    _db.OrdersMeridian.Remove(s);
-                }
-            }
-            _db.SaveChanges();
-        }
-
-        private void SaveOrderMeridian_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (var item in OrdersMeridian)
-            {
-                if (item.Id == 0)
-                {
-                    _db.OrdersMeridian.Add(item);
-                }
-                else
-                {
-                    _db.OrdersMeridian.Update(item);
-                }
-            }
-            _db.SaveChanges();
-            LoadData();
-        }
-
-        // Prices
-        private void AddPriceItem_Click(object sender, RoutedEventArgs e)
-        {
-            var item = new PriceItem { SupplierOrBrand = "", Name = "", Price = 0M };
-            Prices.Insert(0, item);
-            PriceGrid.SelectedItem = item;
-            PriceGrid.ScrollIntoView(item);
-        }
-
-        private void DeletePriceItem_Click(object sender, RoutedEventArgs e)
-        {
-            var selected = PriceGrid.SelectedItems.Cast<PriceItem>().ToList();
-            if (selected.Count == 0) return;
-
-            foreach (var s in selected)
-            {
-                Prices.Remove(s);
-                if (s.Id != 0)
-                {
-                    _db.PriceItems.Remove(s);
-                }
-            }
-            _db.SaveChanges();
-        }
-
-        private void SavePriceItem_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (var item in Prices)
-            {
-                if (item.Id == 0)
-                {
-                    _db.PriceItems.Add(item);
-                }
-                else
-                {
-                    _db.PriceItems.Update(item);
-                }
-            }
-            _db.SaveChanges();
-            LoadData();
-        }
-
-        protected override void OnClosed(System.EventArgs e)
-        {
-            base.OnClosed(e);
-            _db.Dispose();
+            MainFrame.Content = new SettingsPage();
         }
     }
 }

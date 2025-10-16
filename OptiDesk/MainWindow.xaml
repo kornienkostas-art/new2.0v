@@ -1,90 +1,50 @@
 <Window x:Class="OptiDesk.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="OptiDesk" Height="720" Width="1100">
+        xmlns:views="clr-namespace:OptiDesk.Views"
+        xmlns:legacy="clr-namespace:OptiDesk.Views.Legacy"
+        Title="OptiDesk" Height="720" Width="1100"
+        WindowStartupLocation="CenterScreen">
     <Grid>
-        <TabControl>
-            <TabItem Header="Заказы МКЛ">
-                <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8">
-                        <Button Content="Добавить" Click="AddOrderMkl_Click" Margin="0,0,8,0"/>
-                        <Button Content="Удалить" Click="DeleteOrderMkl_Click" Margin="0,0,8,0"/>
-                        <Button Content="Сохранить изменения" Click="SaveOrderMkl_Click"/>
-                    </StackPanel>
-                    <DataGrid x:Name="OrderMklGrid"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="True"
-                              CanUserDeleteRows="False"
-                              IsReadOnly="False"
-                              Margin="8"
-                              SelectionMode="Extended">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="60"/>
-                            <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="200"/>
-                            <DataGridTextColumn Header="Бренд" Binding="{Binding Brand}" Width="150"/>
-                            <DataGridTextColumn Header="Сфера" Binding="{Binding Sphere}" Width="80"/>
-                            <DataGridTextColumn Header="Цилиндр" Binding="{Binding Cylinder}" Width="80"/>
-                            <DataGridTextColumn Header="Ось" Binding="{Binding Axis}" Width="80"/>
-                            <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140"/>
-                            <DataGridTextColumn Header="Дата создания" Binding="{Binding CreatedAt}" Width="140"/>
-                            <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-            </TabItem>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
 
-            <TabItem Header="Заказы Меридиан">
-                <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8">
-                        <Button Content="Добавить" Click="AddOrderMeridian_Click" Margin="0,0,8,0"/>
-                        <Button Content="Удалить" Click="DeleteOrderMeridian_Click" Margin="0,0,8,0"/>
-                        <Button Content="Сохранить изменения" Click="SaveOrderMeridian_Click"/>
-                    </StackPanel>
-                    <DataGrid x:Name="OrderMeridianGrid"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="True"
-                              CanUserDeleteRows="False"
-                              IsReadOnly="False"
-                              Margin="8"
-                              SelectionMode="Extended">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="60"/>
-                            <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="200"/>
-                            <DataGridTextColumn Header="Поставщик" Binding="{Binding Supplier}" Width="150"/>
-                            <DataGridTextColumn Header="Тип линзы" Binding="{Binding LensType}" Width="150"/>
-                            <DataGridTextColumn Header="Особые поля" Binding="{Binding SpecialFields}" Width="*"/>
-                            <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140"/>
-                            <DataGridTextColumn Header="Дата создания" Binding="{Binding CreatedAt}" Width="140"/>
-                            <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-            </TabItem>
+        <!-- Side Nav -->
+        <Border Grid.RowSpan="2" Background="#111827"/>
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Background="#111827">
+            <TextBlock Text="OptiDesk" Foreground="White" FontSize="20" FontWeight="Bold" Margin="16,16,0,16" VerticalAlignment="Center"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0" Background="#111827" Padding="8" Spacing="6">
+            <Button Content="Главная (старый интерфейс)" Click="OpenLegacy_Click" Margin="4" Padding="10"
+                    Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
+            <Separator Margin="4" Background="#374151"/>
+            <Button Content="Заказы МКЛ" Click="OpenOrdersMkl_Click" Margin="4" Padding="10"
+                    Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
+            <Button Content="Заказы Меридиан" Click="OpenOrdersMeridian_Click" Margin="4" Padding="10"
+                    Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
+            <Button Content="Прайсы" Click="OpenPrices_Click" Margin="4" Padding="10"
+                    Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
+            <Separator Margin="4" Background="#374151"/>
+            <Button Content="Настройки" Click="OpenSettings_Click" Margin="4" Padding="10"
+                    Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
+        </StackPanel>
 
-            <TabItem Header="Прайсы">
-                <DockPanel>
-                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8">
-                        <Button Content="Добавить" Click="AddPriceItem_Click" Margin="0,0,8,0"/>
-                        <Button Content="Удалить" Click="DeletePriceItem_Click" Margin="0,0,8,0"/>
-                        <Button Content="Сохранить изменения" Click="SavePriceItem_Click"/>
-                    </StackPanel>
-                    <DataGrid x:Name="PriceGrid"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="True"
-                              CanUserDeleteRows="False"
-                              IsReadOnly="False"
-                              Margin="8"
-                              SelectionMode="Extended">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="60"/>
-                            <DataGridTextColumn Header="Бренд/Поставщик" Binding="{Binding SupplierOrBrand}" Width="180"/>
-                            <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="250"/>
-                            <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="100"/>
-                            <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-            </TabItem>
-        </TabControl>
+        <!-- Header -->
+        <Border Grid.Row="0" Grid.Column="1" Background="#F3F4F6" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <DockPanel LastChildFill="True" Margin="12,0">
+                <TextBlock Text="Современная оболочка" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="16"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Content -->
+        <Border Grid.Row="1" Grid.Column="1" Background="#FFFFFF">
+            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+        </Border>
     </Grid>
 </Window>
