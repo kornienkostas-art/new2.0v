@@ -1,0 +1,38 @@
+<UserControl x:Class="ZakazLinz.Wpf.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:ZakazLinz.Wpf.ViewModels"
+             mc:Ignorable="d">
+    <UserControl.DataContext>
+        <vm:SettingsViewModel/>
+    </UserControl.DataContext>
+    <ScrollViewer>
+        <StackPanel Margin="12" Width="600">
+            <TextBlock Text="Настройки" FontSize="18" FontWeight="Bold" Margin="0,0,0,12"/>
+            <StackPanel Orientation="Vertical" Margin="0,8">
+                <TextBlock Text="Масштаб интерфейса (%)"/>
+                <TextBox Text="{Binding UiScalePercent, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="0,8">
+                <TextBlock Text="Размер шрифта"/>
+                <TextBox Text="{Binding FontSize, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical" Margin="0,8">
+                <TextBlock Text="Папка экспорта"/>
+                <DockPanel>
+                    <TextBox Text="{Binding ExportFolder, UpdateSourceTrigger=PropertyChanged}" MinWidth="400"/>
+                    <Button Content="Выбрать" Margin="8,0,0,0" Command="{Binding BrowseExportFolderCommand}"/>
+                </DockPanel>
+            </StackPanel>
+            <CheckBox Content="Показывать иконку в трее" IsChecked="{Binding EnableTray}"/>
+            <CheckBox Content="Показывать уведомления" IsChecked="{Binding EnableNotifications}"/>
+            <CheckBox Content="Автозапуск при старте Windows" IsChecked="{Binding EnableAutostart}"/>
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button Content="Сохранить" Width="120" Command="{Binding SaveCommand}"/>
+                <Button Content="Отмена" Width="120" Margin="8,0,0,0" Command="{Binding ReloadCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
