@@ -17,16 +17,25 @@ namespace ZakazLinz.Wpf.Views
 
         private void InitializeTray()
         {
-            // Загружаем TaskbarIcon из ресурсов
-            var dict = new ResourceDictionary
+            try
             {
-                Source = new System.Uri("/ZakazLinz.Wpf;component/Tray/TrayIcon.xaml", System.UriKind.Relative)
-            };
-            if (dict["AppTrayIcon"] is TaskbarIcon tray)
+                // Загружаем TaskbarIcon из ресурсов
+                var dict = new ResourceDictionary
+                {
+                    Source = new System.Uri("/ZakazLinz.Wpf;component/Tray/TrayIcon.xaml", System.UriKind.Relative)
+                };
+                if (dict["AppTrayIcon"] is TaskbarIcon tray)
+                {
+                    _trayIcon = tray;
+                    _trayIcon.DataContext = new TrayViewModel();
+                    // Задаём системную иконку, чтобы не падать без ресурсов
+                    _trayIcon.Icon = System.Drawing.SystemIcons.Application;
+                    _trayIcon.Visibility = System.Windows.Visibility.Visible;
+                }
+            }
+            catch
             {
-                _trayIcon = tray;
-                _trayIcon.DataContext = new TrayViewModel();
-                _trayIcon.Visibility = System.Windows.Visibility.Visible;
+                // Если трей не инициализировался, продолжаем работу окна
             }
         }
 
