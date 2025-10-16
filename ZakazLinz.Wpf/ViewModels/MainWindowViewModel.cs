@@ -1,12 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows.Controls;
 
 namespace ZakazLinz.Wpf.Views
 {
     public partial class MainWindowViewModel : ObservableObject
     {
-        [ObservableProperty] private UserControl? currentView;
+        [ObservableProperty] private System.Windows.Controls.UserControl? currentView;
         [ObservableProperty] private string statusText = "Готово";
 
         public IRelayCommand OpenMklOrdersCommand { get; }
