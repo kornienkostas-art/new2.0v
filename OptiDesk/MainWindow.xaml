@@ -20,18 +20,18 @@
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Background="#111827">
             <TextBlock Text="OptiDesk" Foreground="White" FontSize="20" FontWeight="Bold" Margin="16,16,0,16" VerticalAlignment="Center"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="0" Background="#111827" Padding="8" Spacing="6">
-            <Button Content="Главная (старый интерфейс)" Click="OpenLegacy_Click" Margin="4" Padding="10"
+        <StackPanel Grid.Row="1" Grid.Column="0" Background="#111827">
+            <Button Content="Главная (старый интерфейс)" Click="OpenLegacy_Click" Margin="8,8,8,4" Padding="10"
                     Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
-            <Separator Margin="4" Background="#374151"/>
-            <Button Content="Заказы МКЛ" Click="OpenOrdersMkl_Click" Margin="4" Padding="10"
+            <Separator Margin="8,4" Background="#374151"/>
+            <Button Content="Заказы МКЛ" Click="OpenOrdersMkl_Click" Margin="8,4" Padding="10"
                     Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
-            <Button Content="Заказы Меридиан" Click="OpenOrdersMeridian_Click" Margin="4" Padding="10"
+            <Button Content="Заказы Меридиан" Click="OpenOrdersMeridian_Click" Margin="8,4" Padding="10"
                     Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
-            <Button Content="Прайсы" Click="OpenPrices_Click" Margin="4" Padding="10"
+            <Button Content="Прайсы" Click="OpenPrices_Click" Margin="8,4" Padding="10"
                     Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
-            <Separator Margin="4" Background="#374151"/>
-            <Button Content="Настройки" Click="OpenSettings_Click" Margin="4" Padding="10"
+            <Separator Margin="8,4" Background="#374151"/>
+            <Button Content="Настройки" Click="OpenSettings_Click" Margin="8,4,8,8" Padding="10"
                     Background="#1F2937" Foreground="White" BorderBrush="#374151"/>
         </StackPanel>
 
