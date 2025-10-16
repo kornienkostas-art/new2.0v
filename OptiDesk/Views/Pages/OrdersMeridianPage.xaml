@@ -3,11 +3,46 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       Title="Заказы Меридиан">
     <Grid>
-        <Border CornerRadius="8" Margin="12" Padding="12" Background="#0F000000">
-            <StackPanel>
-                <TextBlock Text="Заказы Меридиан" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
-                <TextBlock Text="Заглушка страницы. Позже перенесем сюда таблицу и логику из вкладки."/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Margin="12" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+            <StackPanel Orientation="Horizontal" Margin="12">
+                <Button Content="Новый заказ" Margin="0,0,8,0" Click="New_Click"/>
+                <Button Content="Редактировать" Margin="0,0,8,0" Click="Edit_Click"/>
+                <Button Content="Удалить" Margin="0,0,8,0" Click="Delete_Click"/>
+                <Separator Width="12"/>
+                <Button Content="Клиент" Margin="0,0,8,0" Click="PickClient_Click"/>
+                <Button Content="Товар" Margin="0,0,8,0" Click="PickProduct_Click"/>
+                <Separator Width="12"/>
+                <Button Content="Экспорт txt" Margin="0,0,8,0" Click="Export_Click"/>
+                <Button Content="Сохранить" Click="Save_Click"/>
             </StackPanel>
+        </Border>
+
+        <Border Grid.Row="1" Margin="12" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+            <DataGrid x:Name="Grid"
+                      Margin="8"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="True"
+                      CanUserDeleteRows="False"
+                      IsReadOnly="False"
+                      SelectionMode="Extended"
+                      ItemsSource="{Binding Items}"
+                      SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True" Width="60"/>
+                    <DataGridTextColumn Header="Клиент" Binding="{Binding ClientName}" Width="200"/>
+                    <DataGridTextColumn Header="Поставщик" Binding="{Binding Supplier}" Width="150"/>
+                    <DataGridTextColumn Header="Тип линзы" Binding="{Binding LensType}" Width="150"/>
+                    <DataGridTextColumn Header="Особые поля" Binding="{Binding SpecialFields}" Width="*"/>
+                    <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="140"/>
+                    <DataGridTextColumn Header="Дата создания" Binding="{Binding CreatedAt}" Width="140"/>
+                    <DataGridTextColumn Header="Комментарий" Binding="{Binding Comment}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Border>
     </Grid>
 </Page>
