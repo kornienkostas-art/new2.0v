@@ -6,9 +6,13 @@
             <TabItem Header="Заказы МКЛ">
                 <DockPanel>
                     <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="8">
-                        <Button Content="Добавить" Click="AddOrderMkl_Click" Margin="0,0,8,0"/>
+                        <Button Content="Новый заказ" Click="AddOrderMkl_Click" Margin="0,0,8,0"/>
+                        <Button Content="Редактировать" Click="EditOrderMkl_Click" Margin="0,0,8,0"/>
                         <Button Content="Удалить" Click="DeleteOrderMkl_Click" Margin="0,0,8,0"/>
-                        <Button Content="Сохранить изменения" Click="SaveOrderMkl_Click"/>
+                        <Button Content="Клиент" Click="PickClientMkl_Click" Margin="0,0,8,0"/>
+                        <Button Content="Товар" Click="PickProductMkl_Click" Margin="0,0,8,0"/>
+                        <Button Content="Экспорт txt" Click="ExportOrderMklTxt_Click" Margin="0,0,8,0"/>
+                        <Button Content="Сохранить" Click="SaveOrderMkl_Click"/>
                     </StackPanel>
                     <DataGrid x:Name="OrderMklGrid"
                               AutoGenerateColumns="False"

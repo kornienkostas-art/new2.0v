@@ -1,9 +1,12 @@
-using OptiDesk.Data;
-using OptiDesk.Models;
+using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using OptiDesk.Data;
+using OptiDesk.Models;
 
 namespace OptiDesk.Views.Legacy
 {
@@ -43,6 +46,20 @@ namespace OptiDesk.Views.Legacy
             OrderMklGrid.ScrollIntoView(item);
         }
 
+        private void EditOrderMkl_Click(object sender, RoutedEventArgs e)
+        {
+            if (OrderMklGrid.SelectedItem is not OrderMKL item) return;
+
+            // Попробуем начать редактирование с колонки "Клиент"
+            if (OrderMklGrid.Columns.Count > 1)
+            {
+                OrderMklGrid.Focus();
+                var column = OrderMklGrid.Columns[1];
+                OrderMklGrid.CurrentCell = new DataGridCellInfo(item, column);
+                OrderMklGrid.BeginEdit();
+            }
+        }
+
         private void DeleteOrderMkl_Click(object sender, RoutedEventArgs e)
         {
             var selected = OrderMklGrid.SelectedItems.Cast<OrderMKL>().ToList();
@@ -74,6 +91,49 @@ namespace OptiDesk.Views.Legacy
             }
             _db.SaveChanges();
             LoadData();
+        }
+
+        private void PickClientMkl_Click(object sender, RoutedEventArgs e)
+        {
+            // Заглушка: позже откроем окно выбора клиента
+            MessageBox.Show("Выбор клиента (заглушка). Позже подключим справочник клиентов.", "Клиент", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void PickProductMkl_Click(object sender, RoutedEventArgs e)
+        {
+            // Заглушка: позже откроем окно выбора товара
+            MessageBox.Show("Выбор товара (заглушка). Позже подключим справочник товаров/прайсов.", "Товар", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void ExportOrderMklTxt_Click(object sender, RoutedEventArgs e)
+        {
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            var filePath = Path.Combine(desktop, $"OrdersMKL_{DateTime.Now:yyyyMMdd_HHmmss}.txt");
+
+            var lines = OrdersMkl
+                .Select(o => string.Join(';', new[]
+                {
+                    o.Id.ToString(),
+                    o.ClientName ?? "",
+                    o.Brand ?? "",
+                    o.Sphere?.ToString(CultureInfo.InvariantCulture) ?? "",
+                    o.Cylinder?.ToString(CultureInfo.InvariantCulture) ?? "",
+                    o.Axis?.ToString(CultureInfo.InvariantCulture) ?? "",
+                    o.Status ?? "",
+                    o.CreatedAt.ToString("s", CultureInfo.InvariantCulture),
+                    o.Comment ?? ""
+                }));
+
+            using (var sw = new StreamWriter(filePath, false, System.Text.Encoding.UTF8))
+            {
+                sw.WriteLine("Id;ClientName;Brand;Sphere;Cylinder;Axis;Status;CreatedAt;Comment");
+                foreach (var line in lines)
+                {
+                    sw.WriteLine(line);
+                }
+            }
+
+            MessageBox.Show($"Экспорт выполнен:\n{filePath}", "Экспорт TXT", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // Meridian
