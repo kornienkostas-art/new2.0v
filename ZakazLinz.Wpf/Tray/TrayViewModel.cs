@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Hardcodet.Wpf.TaskbarNotification;
-using System.Windows;
 using ZakazLinz.Wpf.Services;
 
 namespace ZakazLinz.Wpf.Tray
@@ -25,16 +24,16 @@ namespace ZakazLinz.Wpf.Tray
             OpenMainCommand = new RelayCommand(OpenMain);
             OpenSettingsCommand = new RelayCommand(OpenSettings);
             ToggleAutostartCommand = new RelayCommand(ToggleAutostart);
-            ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
+            ExitCommand = new RelayCommand(() => System.Windows.Application.Current.Shutdown());
         }
 
         private void OpenMain()
         {
-            var win = Application.Current.MainWindow;
+            var win = System.Windows.Application.Current.MainWindow;
             if (win != null)
             {
                 win.Show();
-                win.WindowState = WindowState.Normal;
+                win.WindowState = System.Windows.WindowState.Normal;
                 win.Activate();
             }
         }

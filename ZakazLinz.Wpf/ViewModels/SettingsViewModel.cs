@@ -1,7 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
-using System.IO;
 using System.Windows.Forms;
 using ZakazLinz.Wpf.Services;
 
@@ -37,27 +35,26 @@ namespace ZakazLinz.Wpf.ViewModels
         private void Load()
         {
             var s = _settingsService.Load();
-            uiScalePercent = s.UiScalePercent;
-            fontSize = s.FontSize;
-            exportFolder = s.ExportFolder ?? "";
-            enableTray = s.EnableTray;
-            enableNotifications = s.EnableNotifications;
-            enableAutostart = _autostartService.IsEnabled();
-            OnPropertyChanged(string.Empty);
+            UiScalePercent = s.UiScalePercent;
+            FontSize = s.FontSize;
+            ExportFolder = s.ExportFolder ?? "";
+            EnableTray = s.EnableTray;
+            EnableNotifications = s.EnableNotifications;
+            EnableAutostart = _autostartService.IsEnabled();
         }
 
         private void Save()
         {
             _settingsService.Save(new Models.Settings
             {
-                UiScalePercent = uiScalePercent,
-                FontSize = fontSize,
-                ExportFolder = exportFolder,
-                EnableTray = enableTray,
-                EnableNotifications = enableNotifications
+                UiScalePercent = UiScalePercent,
+                FontSize = FontSize,
+                ExportFolder = ExportFolder,
+                EnableTray = EnableTray,
+                EnableNotifications = EnableNotifications
             });
 
-            if (enableAutostart)
+            if (EnableAutostart)
                 _autostartService.Enable();
             else
                 _autostartService.Disable();
