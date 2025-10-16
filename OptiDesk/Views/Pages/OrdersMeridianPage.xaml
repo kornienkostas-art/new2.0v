@@ -1,0 +1,13 @@
+<Page x:Class="OptiDesk.Views.Pages.OrdersMeridianPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Заказы Меридиан">
+    <Grid>
+        <Border CornerRadius="8" Margin="12" Padding="12" Background="#0F000000">
+            <StackPanel>
+                <TextBlock Text="Заказы Меридиан" FontSize="20" FontWeight="Bold" Margin="0,0,0,8"/>
+                <TextBlock Text="Заглушка страницы. Позже перенесем сюда таблицу и логику из вкладки."/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Page>
