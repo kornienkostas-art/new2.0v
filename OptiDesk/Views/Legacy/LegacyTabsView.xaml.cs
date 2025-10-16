@@ -20,6 +20,7 @@ namespace OptiDesk.Views.Legacy
             InitializeComponent();
             _db.Database.EnsureCreated();
             LoadData();
+            Unloaded += LegacyTabsView_Unloaded;
         }
 
         private void LoadData()
@@ -159,9 +160,8 @@ namespace OptiDesk.Views.Legacy
             LoadData();
         }
 
-        protected override void OnUnloaded(RoutedEventArgs e)
+        private void LegacyTabsView_Unloaded(object sender, RoutedEventArgs e)
         {
-            base.OnUnloaded(e);
             _db.Dispose();
         }
     }
