@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using OptiDesk.ViewModels;
+using OptiDesk.Views.Dialogs;
 
 namespace OptiDesk.Views.Pages
 {
@@ -54,12 +55,32 @@ namespace OptiDesk.Views.Pages
 
         private void PickClient_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Выбор клиента (заглушка).", "Клиент", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dlg = new ClientPickerWindow();
+            dlg.Owner = Window.GetWindow(this);
+            if (dlg.ShowDialog() == true && dlg.Selected != null && _vm.SelectedItem != null)
+            {
+                _vm.SelectedItem.ClientName = dlg.Selected.Name;
+                Grid.Items.Refresh();
+            }
         }
 
         private void PickProduct_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Выбор товара (заглушка).", "Товар", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dlg = new ProductPickerWindow();
+            dlg.Owner = Window.GetWindow(this);
+            if (dlg.ShowDialog() == true && dlg.Selected != null && _vm.SelectedItem != null)
+            {
+                // Для МКЛ заполняем Brand из SupplierOrBrand, а наименование в комментарий (как подсказку)
+                _vm.SelectedItem.Brand = dlg.Selected.SupplierOrBrand ?? "";
+                if (!string.IsNullOrWhiteSpace(dlg.Selected.Name))
+                {
+                    var hint = $"Товар: {dlg.Selected.Name}";
+                    _vm.SelectedItem.Comment = string.IsNullOrWhiteSpace(_vm.SelectedItem.Comment)
+                        ? hint
+                        : _vm.SelectedItem.Comment + " | " + hint;
+                }
+                Grid.Items.Refresh();
+            }
         }
     }
 }

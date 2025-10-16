@@ -1,0 +1,41 @@
+<Window x:Class="OptiDesk.Views.Dialogs.ProductPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Выбор товара/позиции" Height="500" Width="820"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Margin="12" Background="#F9FAFB" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+            <DockPanel Margin="12">
+                <TextBox x:Name="SearchBox" Width="260" Margin="0,0,8,0" VerticalAlignment="Center" />
+                <Button Content="Найти" Click="Search_Click" Margin="0,0,8,0"/>
+                <Button Content="Добавить" Click="Add_Click" Margin="0,0,8,0"/>
+                <Button Content="Изменить" Click="Edit_Click" Margin="0,0,8,0"/>
+                <Button Content="Удалить" Click="Delete_Click"/>
+            </DockPanel>
+        </Border>
+
+        <Border Grid.Row="1" Margin="12" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8">
+            <DataGrid x:Name="Grid" Margin="8" AutoGenerateColumns="False" SelectionMode="Extended">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" IsReadOnly="True"/>
+                    <DataGridTextColumn Header="Поставщик/Бренд" Binding="{Binding SupplierOrBrand}" Width="200"/>
+                    <DataGridTextColumn Header="Наименование" Binding="{Binding Name}" Width="300"/>
+                    <DataGridTextColumn Header="Цена" Binding="{Binding Price}" Width="120"/>
+                    <DataGridTextColumn Header="Примечание" Binding="{Binding Note}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="12">
+            <Button Content="Выбрать" Width="120" Margin="0,0,8,0" Click="Pick_Click"/>
+            <Button Content="Отмена" Width="120" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

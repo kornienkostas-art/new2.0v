@@ -10,6 +10,7 @@ namespace OptiDesk.Data
         public DbSet<OrderMKL> OrdersMKL { get; set; } = null!;
         public DbSet<OrderMeridian> OrdersMeridian { get; set; } = null!;
         public DbSet<PriceItem> PriceItems { get; set; } = null!;
+        public DbSet<Client> Clients { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

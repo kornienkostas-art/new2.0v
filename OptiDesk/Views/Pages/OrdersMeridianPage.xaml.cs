@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using OptiDesk.ViewModels;
+using OptiDesk.Views.Dialogs;
 
 namespace OptiDesk.Views.Pages
 {
@@ -54,12 +55,26 @@ namespace OptiDesk.Views.Pages
 
         private void PickClient_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Выбор клиента (заглушка).", "Клиент", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dlg = new ClientPickerWindow();
+            dlg.Owner = Window.GetWindow(this);
+            if (dlg.ShowDialog() == true && dlg.Selected != null && _vm.SelectedItem != null)
+            {
+                _vm.SelectedItem.ClientName = dlg.Selected.Name;
+                Grid.Items.Refresh();
+            }
         }
 
         private void PickProduct_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Выбор товара (заглушка).", "Товар", MessageBoxButton.OK, MessageBoxImage.Information);
+            var dlg = new ProductPickerWindow();
+            dlg.Owner = Window.GetWindow(this);
+            if (dlg.ShowDialog() == true && dlg.Selected != null && _vm.SelectedItem != null)
+            {
+                // Для Меридиан заполняем Supplier и LensType
+                _vm.SelectedItem.Supplier = dlg.Selected.SupplierOrBrand ?? "Меридиан";
+                _vm.SelectedItem.LensType = dlg.Selected.Name ?? "";
+                Grid.Items.Refresh();
+            }
         }
     }
 }
